@@ -1,0 +1,15 @@
+{
+    "name": "mac/gesemp",
+    "description": "exercice gestion employés",
+    "type": "project",
+    "require": {
+        "php": ">=8.1"
+    },
+    "license": "MIT",
+    "autoload": {
+    "psr-4": {
+        "App\\": "src/"
+    }
+},
+    "minimum-stability": "stable"
+}
