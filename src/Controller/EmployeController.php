@@ -11,10 +11,10 @@ use App\Entity\Employe;
 use App\Entity\Departement;
 use App\Entity\Specialite;
 
-#[Route('/employe')]
+
 class EmployeController extends AbstractController
 {
-    #[Route('/', name: 'employe_index', methods: ['GET'])]
+    #[Route('/employe/list', name: 'employe_index', methods: ['GET'])]
     public function index(Request $request, EntityManagerInterface $em): Response
     {
         $departementId = $request->query->get('departement_id');
@@ -49,7 +49,7 @@ class EmployeController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'employe_new', methods: ['GET','POST'])]
+    #[Route('/employe/new', name: 'employe_new', methods: ['GET','POST'])]
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         $departements = $em->getRepository(Departement::class)->findAll();

@@ -10,13 +10,13 @@ use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Departement;
 use App\Repository\DepartementRepository;
 
-#[Route('/departement')]
+
 class DepartementController extends AbstractController
 {   
     public function __construct(private readonly DepartementRepository $repository)
     {
     }
-    #[Route('/', name: 'departement_index', methods: ['GET'])]
+    #[Route('/departement/list', name: 'departement_index', methods: ['GET'])]
     public function index(): Response
     {
         $departements = $this->repository->findAll();
@@ -26,7 +26,7 @@ class DepartementController extends AbstractController
         ]);
     }
 
-    #[Route('/new', name: 'departement_new', methods: ['GET','POST'])]
+    #[Route('/departement/new', name: 'departement_new', methods: ['GET','POST'])]
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         if ($request->isMethod('POST')) {
