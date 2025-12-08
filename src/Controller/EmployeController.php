@@ -49,51 +49,5 @@ class EmployeController extends AbstractController
         ]);
     }
 
-    #[Route('/employe/new', name: 'employe_new', methods: ['GET','POST'])]
-    public function new(Request $request, EntityManagerInterface $em): Response
-    {
-        $departements = $em->getRepository(Departement::class)->findAll();
-        $specialites = Specialite::cases();
-
-        if ($request->isMethod('POST')) {
-            $nom = $request->request->get('nom');
-            $tel = $request->request->get('tel');
-            $salaire = $request->request->get('salaire');
-            $specialite = $request->request->get('specialite');
-            $departementId = $request->request->get('departement_id');
-
-            $errors = [];
-            if (!$nom) $errors[] = 'Le nom est obligatoire.';
-            if (!$specialite) $errors[] = 'La spécialité est obligatoire.';
-            if (!$departementId) $errors[] = 'Le département est obligatoire.';
-
-            if (empty($errors)) {
-                $departement = $em->getRepository(Departement::class)->find($departementId);
-                if ($departement) {
-                    $employe = new Employe();
-                    $employe->setNom($nom)
-                            ->setTel($tel ?: null)
-                            ->setSalaire($salaire ? (float)$salaire : null)
-                            ->setSpecialite(Specialite::from($specialite))
-                            ->setDepartement($departement);
-                    $em->persist($employe);
-                    $em->flush();
-
-                    $this->addFlash('success', 'Employé créé avec succès !');
-                    return $this->redirectToRoute('employe_index');
-                } else {
-                    $errors[] = 'Département introuvable.';
-                }
-            }
-
-            foreach ($errors as $error) {
-                $this->addFlash('error', $error);
-            }
-        }
-
-        return $this->render('employe/new.html.twig', [
-            'departements' => $departements,
-            'specialites' => $specialites,
-        ]);
-    }
+    
 }

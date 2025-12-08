@@ -26,26 +26,4 @@ class DepartementController extends AbstractController
         ]);
     }
 
-    #[Route('/departement/new', name: 'departement_new', methods: ['GET','POST'])]
-    public function new(Request $request, EntityManagerInterface $em): Response
-    {
-        if ($request->isMethod('POST')) {
-            $nom = $request->request->get('nom');
-
-            if ($nom) {
-                $departement = new Departement();
-                $departement->setNom($nom);
-                $em->persist($departement);
-                $em->flush();
-
-                $this->addFlash('success', 'Département créé avec succès !');
-
-                return $this->redirectToRoute('departement_index');
-            }
-
-            $this->addFlash('error', 'Le nom est obligatoire.');
-        }
-
-        return $this->render('departement/new.html.twig');
-    }
 }
