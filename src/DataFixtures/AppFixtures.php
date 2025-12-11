@@ -28,13 +28,14 @@ class AppFixtures extends Fixture
         }
         $this->em->flush();
         $departements = $this->repo->findAll();
-        foreach($departements as $dep){
+        foreach($departements as $key => $dep){
             for ($j = 1; $j <= 10; $j++){
                 $employe = new Employe();
                 $employe->setNom('Employé ' . $j.'-'. $dep->getNom());
                 $specialites = Specialite::cases();
                 $employe->setSpecialite($specialites[array_rand($specialites)]);
                 $employe->setCreatedAt(new \DateTimeImmutable());
+                $employe->setTel('070000000' .$key. $j);
                 $employe->setIsActive(true);
                 $employe->setDepartement($dep);
                 $this->em->persist($employe);

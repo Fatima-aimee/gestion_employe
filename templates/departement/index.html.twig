@@ -1,49 +1,111 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Liste des Départements</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 min-h-screen p-6">
+{% extends "base.html.twig" %}
 
-    <div class="max-w-5xl mx-auto">
-        <!-- Titre et bouton Ajouter -->
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-3xl font-bold text-gray-800">Liste des Départements</h1>
-            
-        </div>
+{% block body %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Liste des Départements</h1>
+    </div>
 
-        <!-- Tableau -->
-        <div class="bg-white shadow-lg rounded-lg overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-blue-200 text-gray-700">
-                    <tr>
-                        <th class="px-4 py-3 text-center">ID</th>
-                        <th class="px-4 py-3 text-center">Nom</th>
-                        <th class="px-4 py-3 text-center">Statut</th>
-                        <th class="px-4 py-3 text-center">Créé le</th>
-                        <th class="px-4 py-3 text-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-300">
-                    {% for departement in departements %}
-                        <tr class="hover:bg-gray-50 text-center">
-                            <td class="px-4 py-2">{{ departement.id }}</td>
-                            <td class="px-4 py-2">{{ departement.nom }}</td>
-                            <td class="px-4 py-2">{{ departement.isActive ? 'Actif' : 'Archivé' }}</td>
-                            <td class="px-4 py-2">{{ departement.createdAt ? departement.createdAt|date('d/m/Y') : '-' }}</td>
-                            
-                        </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="5" class="py-4 text-center text-gray-500">Aucun département trouvé</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <!-- Enregistrement d'un Département -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        {{ form_widget(formDept.nom) }}
+                    </div>
+                    <div class="text-danger">{{ form_errors(formDept.nom) }}</div>
+                </div>
+                <div class="col-md-2">
+                    {{ form_widget(formDept.saveDepartement ) }}
+                </div>
+            </div>
+            {{ form_end(formDept) }}
         </div>
     </div>
 
-</body>
-</html>
+    <!-- Liste des Départements -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th class="text-center">Name</th>
+                            <th class="text-center">Date Creation</th>
+                            <th class="text-center">Statut</th>
+                            <th class="text-center">Nbre Employe</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for departement in departements %}
+                            <tr>
+                                <td class="text-center">{{ departement.nom }}</td>
+                                <td class="text-center">{{ departement.createdAt|date("d/m/Y") }}</td>
+                                <td class="text-center">
+                                    {% if departement.isActive %}
+                                        <span class="badge bg-success">Actif</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactif</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">{{ departement.employes|length }}</td>
+                                <td class="text-center">
+                                    <a href="{{ path('app_employe_list', { idDept: departement.id }) }}"
+                                       class="btn btn-sm btn-primary">
+                                        <i class="fas fa-eye"></i> Voir Employes
+                                    </a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center">
+                                    <div class="alert alert-danger" role="alert">
+                                        La liste de départements est vide
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination intégrée directement -->
+            {% if nbrePage > 1 %}
+                    <nav>
+                        <ul class="pagination justify-content-center mt-3">
+
+                            {# Précédent #}
+                            <li class="page-item {% if pageEncours <= 1 %}disabled{% endif %}">
+                                <a class="page-link"
+                                   href="{{ path('app_departement_list', { page: pageEncours-1 }) }}">
+                                    Précédent
+                                </a>
+                            </li>
+
+                            {# Numéros #}
+                            {% for i in 1..nbrePage %}
+                                <li class="page-item {% if i == pageEncours %}active{% endif %}">
+                                    <a class="page-link"
+                                       href="{{ path('app_departement_list', { page: i }) }}">
+                                        {{ i }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+
+                            {# Suivant #}
+                            <li class="page-item {% if pageEncours >= nbrePage %}disabled{% endif %}">
+                                <a class="page-link"
+                                   href="{{ path('app_departement_list', { page: pageEncours+1 }) }}">
+                                    Suivant
+                                </a>
+                            </li>
+
+                        </ul>
+                    </nav>
+                {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

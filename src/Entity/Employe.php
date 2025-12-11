@@ -21,8 +21,8 @@ class Employe
     #[ORM\Column(type: 'string', length: 20, nullable: true)]
     private ?string $tel = null;
 
-    #[ORM\Column(type: 'float', nullable: true)]
-    private ?float $salaire = null;
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $adresse = null;
 
     #[ORM\Column(type: 'string', enumType: Specialite::class)]
     private ?Specialite $specialite = null;
@@ -74,14 +74,14 @@ class Employe
         return $this;
     }
 
-    public function getSalaire(): ?float
+    public function getAdresse(): ?string
     {
-        return $this->salaire;
+        return $this->adresse;
     }
 
-    public function setSalaire(float $salaire): self
+    public function setAdresse(string $adresse): self
     {
-        $this->salaire = $salaire;
+        $this->adresse = $adresse;
         return $this;
     }
 

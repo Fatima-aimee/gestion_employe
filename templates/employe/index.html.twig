@@ -1,74 +1,137 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Liste des Employés</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100 min-h-screen p-6">
+{% extends "base.html.twig" %}
+      {% block body %}
+    <!-- Contenu principal -->
+       <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Liste des Employes </h2>
+                <a href="#" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Nouveau Employe
+                </a>
+        </div>
+        <!-- Filtres et recherche -->
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
 
-<div class="max-w-6xl mx-auto">
+        <form method="get">
+            <div class="row g-3 align-items-center">
 
-    <!-- Titre et bouton Ajouter -->
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold text-gray-800">Liste des Employés</h1>
-        
+                {# Barre de recherche #}
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <input type="text" 
+                               class="form-control" 
+                               name="search"
+                               value="{{ search|default('') }}"
+                               placeholder="Rechercher par téléphone">
+
+                        <button class="btn btn-outline-secondary">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+
+                {# Filtre département #}
+                <div class="col-md-4">
+                    <select name="idDept" 
+                            class="form-select"
+                            onchange="this.form.submit()">
+
+                        <option value=""> Départements </option>
+
+                        {% for departement in departements %}
+                            <option value="{{ departement.id }}"
+                                {% if idDept == departement.id %}selected{% endif %}>
+                                {{ departement.nom }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+            </div>
+        </form>
+
     </div>
-
-    <!-- Formulaire de filtre -->
-    <form method="get" class="mb-6 flex items-center space-x-2">
-
-        <select name="departement_id" class="border rounded px-3 py-2">
-            <option value="">Tous les départements</option>
-            {% for departement in departements %}
-                <option value="{{ departement.id }}"
-                    {% if departement.id == selectedDepartementId %}selected{% endif %}>
-                    {{ departement.nom }}
-                </option>
-            {% endfor %}
-        </select>
-
-        <button type="submit"
-                class="bg-blue-400 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded">
-            Filtrer
-        </button>
-    </form>
-
-    <!-- Tableau des employés -->
-    <div class="bg-white shadow-lg rounded-lg overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-blue-200 text-gray-700">
-                <tr>
-                    <th class="px-4 py-3 text-center">ID</th>
-                    <th class="px-4 py-3 text-center">Nom</th>
-                    <th class="px-4 py-3 text-center">Téléphone</th>
-                    <th class="px-4 py-3 text-center">Spécialité</th>
-                    <th class="px-4 py-3 text-center">Département</th>
-                    <th class="px-4 py-3 text-center">Statut</th>
-                    <th class="px-4 py-3 text-center">Actions</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-300">
-                {% for employe in employes %}
-                    <tr class="hover:bg-gray-50 text-center">
-                        <td class="px-4 py-2">{{ employe.id }}</td>
-                        <td class="px-4 py-2">{{ employe.nom }}</td>
-                        <td class="px-4 py-2">{{ employe.tel ?: '-' }}</td>
-                        <td class="px-4 py-2">{{ employe.specialite.value }}</td>
-                        <td class="px-4 py-2">{{ employe.departement.nom }}</td>
-                        <td class="px-4 py-2">{{ employe.isActive ? 'Actif' : 'Archivé' }}</td>
-    
-                    </tr>
-                {% else %}
-                    <tr>
-                        <td colspan="7" class="py-4 text-center text-gray-500">Aucun employé trouvé</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
 </div>
 
-</body>
-</html>
+
+        
+        <!-- Liste des comptes -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+            {% if employes|length >0 %}
+                  <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th class="text-center">Nom et Prenom</th>
+                                <th class="text-center">Telephone</th>
+                                <th class="text-center">Date Embauche</th>
+                                <th class="text-center">Statut</th>
+                                <th class="text-center">Departement</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for employe in employes %}
+                            <tr>
+                                <td class="text-center">{{employe.nom}}</td>
+                                <td class="text-center">{{employe.tel}}</td>
+                                <td class="text-center">{{employe.createdAt|date("d/m/Y")}}</td>
+                                <td class="text-center">
+                                        {% if employe.isActive %}
+                                            <span class="badge bg-success">Actif</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Inactif</span>
+                                        {% endif %}
+                                </td>
+                                <td class="text-center">{{ employe.departement.nom }}</td>
+
+                            </tr>
+                            {% endfor %}
+                           
+                        </tbody>
+                    </table>
+                </div>
+                {% if nbrePage > 1 %}
+                        <nav>
+                            <ul class="pagination justify-content-center mt-3">
+
+                                {# Bouton Précédent #}
+                                <li class="page-item {% if pageEncours <= 1 %}disabled{% endif %}">
+                                    <a class="page-link"
+                                    href="{{ path('app_employe_list', { idDept: idDept|default(null), page: pageEncours-1 }) }}">
+                                        Précédent
+                                    </a>
+                                </li>
+
+                                {# Numéros de page #}
+                                {% for i in 1..nbrePage %}
+                                    <li class="page-item {% if i == pageEncours %}active{% endif %}">
+                                        <a class="page-link"
+                                        href="{{ path('app_employe_list', { idDept: idDept|default(null), page: i }) }}">
+                                            {{ i }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+
+                                {# Bouton Suivant #}
+                                <li class="page-item {% if pageEncours >= nbrePage %}disabled{% endif %}">
+                                    <a class="page-link"
+                                    href="{{ path('app_employe_list', { idDept: idDept|default(null), page: pageEncours+1 }) }}">
+                                        Suivant
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </nav>
+                    {% endif %}
+                 {% else %}
+                           <div class="text-center alert alert-danger" role="alert">
+                                Cette liste est vide
+                           </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+ 

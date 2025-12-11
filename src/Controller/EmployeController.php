@@ -5,49 +5,48 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use App\Entity\Employe;
-use App\Entity\Departement;
-use App\Entity\Specialite;
+use App\Repository\DepartementRepository;
+use App\Repository\EmployeRepository;
 
 
 class EmployeController extends AbstractController
-{
-    #[Route('/employe/list', name: 'employe_index', methods: ['GET'])]
-    public function index(Request $request, EntityManagerInterface $em): Response
+{   
+    private const LIMIT_PAR_PAGE=10;
+    public function __construct(private readonly EmployeRepository $employeRepository,private readonly DepartementRepository $departementRepository)
+    { 
+    }
+    
+    #[Route('/employe/list/{idDept?}', name: 'app_employe_list', methods: ['GET'])]
+    public function index(?int $idDept, Request $request): Response
     {
-        $departementId = $request->query->get('departement_id');
-        $search = $request->query->get('q');
-
-        $departements = $em->getRepository(Departement::class)->findAll();
-
-        // Création du query builder pour récupérer les employés
-        $qb = $em->getRepository(Employe::class)->createQueryBuilder('e');
-
-        // Filtre par département si sélectionné
-        if ($departementId) {
-            $qb->andWhere('e.departement = :dep')
-               ->setParameter('dep', $departementId);
+        $page = $request->query->getInt('page', 1);
+        $limit = self::LIMIT_PAR_PAGE; 
+        $offset = ($page - 1) * $limit;
+        if ($idDept !== null) {
+            $employes = $this->employeRepository->findBy(
+                ['departement' => $idDept],
+                ['id' => 'asc'],
+                $limit,
+                $offset
+            );
+            $total = $this->employeRepository->count(['departement' => $idDept]);
+        } else {
+            $employes = $this->employeRepository->findBy(
+                [],
+                ['id' => 'asc'],
+                $limit,
+                $offset
+            );
+            $total = $this->employeRepository->count([]);
         }
-
-        // Filtre par recherche sur le nom
-        if ($search) {
-            $safeSearch = addcslashes($search, '%_');
-            $qb->andWhere('e.nom LIKE :search')
-            ->setParameter('search', "%$safeSearch%");
-        }
-
-        // Exécution de la requête
-        $employes = $qb->getQuery()->getResult();
-
+        $nbrePage = ceil($total / $limit);
         return $this->render('employe/index.html.twig', [
-            'departements' => $departements,
             'employes' => $employes,
-            'selectedDepartementId' => $departementId,
-            'search' => $search,
+            'pageEncours' => $page,
+            'nbrePage' => $nbrePage,
+            'idDept' => $idDept,
+            'departements' => $this->departementRepository->findAll(),
         ]);
     }
-
-    
 }
