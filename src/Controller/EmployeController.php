@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Employe;
+use App\Form\EmployeType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -48,5 +50,21 @@ class EmployeController extends AbstractController
             'idDept' => $idDept,
             'departements' => $this->departementRepository->findAll(),
         ]);
+    }
+
+    #[Route('/employe/add', name: 'app_employe_add',methods:["GET","POST"])]
+    public function add(Request $request): Response
+    {
+        $employe=new Employe();
+        $form=$this->createForm(EmployeType::class, $employe);
+        $form->handleRequest($request);
+        if($form->isSubmitted() && $form->isValid()){
+             $this->employeRepository->save($employe, true);
+             return $this->redirectToRoute('app_employe_list');
+        }
+
+         return $this->render('employe/form.html.twig', [
+             'formEmp' => $form->createView()
+         ]);
     }
 }

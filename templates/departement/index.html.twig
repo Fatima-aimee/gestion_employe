@@ -9,20 +9,24 @@
     <!-- Enregistrement d'un Département -->
     <div class="card border-0 shadow-sm mb-4">
         <div class="card-body">
+            {{ form_start(formDept) }}
             <div class="row g-3">
                 <div class="col-md-6">
                     <div class="input-group">
                         {{ form_widget(formDept.nom) }}
                     </div>
-                    <div class="text-danger">{{ form_errors(formDept.nom) }}</div>
+                    {%if form_errors(formDept.nom)%}
+                        <div class="text-danger">{{ form_errors(formDept.nom) }}</div>
+                    {% endif %}
                 </div>
                 <div class="col-md-2">
-                    {{ form_widget(formDept.saveDepartement ) }}
+                    {{ form_widget(formDept.saveDepartement) }}
                 </div>
             </div>
             {{ form_end(formDept) }}
         </div>
     </div>
+
 
     <!-- Liste des Départements -->
     <div class="card border-0 shadow-sm">
@@ -31,10 +35,10 @@
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th class="text-center">Name</th>
-                            <th class="text-center">Date Creation</th>
+                            <th class="text-center">Nom du Département</th>
+                            <th class="text-center">Date Création</th>
                             <th class="text-center">Statut</th>
-                            <th class="text-center">Nbre Employe</th>
+                            <th class="text-center">Nbre Employés</th>
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>
@@ -43,16 +47,15 @@
                             <tr>
                                 <td class="text-center">{{ departement.nom }}</td>
                                 <td class="text-center">{{ departement.createdAt|date("d/m/Y") }}</td>
-                                <td class="text-center">
-                                    {% if departement.isActive %}
-                                        <span class="badge bg-success">Actif</span>
-                                    {% else %}
-                                        <span class="badge bg-secondary">Inactif</span>
-                                    {% endif %}
+                                <td class="text-center"> {% include "partials/statut.html.twig" with {
+                                    active: departement.isActive,
+                                    color: departement.isActive ? "success" : "secondary"
+                                } %}
                                 </td>
+
                                 <td class="text-center">{{ departement.employes|length }}</td>
                                 <td class="text-center">
-                                    <a href="{{ path('app_employe_list', { idDept: departement.id }) }}"
+                                    <a href="{{ path("app_employe_list", { idDept: departement.id }) }}"
                                        class="btn btn-sm btn-primary">
                                         <i class="fas fa-eye"></i> Voir Employes
                                     </a>
@@ -72,39 +75,8 @@
             </div>
 
             <!-- Pagination intégrée directement -->
-            {% if nbrePage > 1 %}
-                    <nav>
-                        <ul class="pagination justify-content-center mt-3">
+                    {% include "partials/pagination.html.twig" with {nbrePage:nbrePage,pageEncours:pageEncours,pathName:"app_departement_list"} %}
 
-                            {# Précédent #}
-                            <li class="page-item {% if pageEncours <= 1 %}disabled{% endif %}">
-                                <a class="page-link"
-                                   href="{{ path('app_departement_list', { page: pageEncours-1 }) }}">
-                                    Précédent
-                                </a>
-                            </li>
-
-                            {# Numéros #}
-                            {% for i in 1..nbrePage %}
-                                <li class="page-item {% if i == pageEncours %}active{% endif %}">
-                                    <a class="page-link"
-                                       href="{{ path('app_departement_list', { page: i }) }}">
-                                        {{ i }}
-                                    </a>
-                                </li>
-                            {% endfor %}
-
-                            {# Suivant #}
-                            <li class="page-item {% if pageEncours >= nbrePage %}disabled{% endif %}">
-                                <a class="page-link"
-                                   href="{{ path('app_departement_list', { page: pageEncours+1 }) }}">
-                                    Suivant
-                                </a>
-                            </li>
-
-                        </ul>
-                    </nav>
-                {% endif %}
         </div>
     </div>
 </div>

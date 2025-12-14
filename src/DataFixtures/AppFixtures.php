@@ -7,9 +7,7 @@ use Doctrine\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Departement;
 use App\Entity\Employe;
-use App\Entity\Specialite;
 use App\Repository\DepartementRepository;
-use Dom\Entity;
 
 class AppFixtures extends Fixture
 {   private EntityManagerInterface $em;
@@ -32,8 +30,6 @@ class AppFixtures extends Fixture
             for ($j = 1; $j <= 10; $j++){
                 $employe = new Employe();
                 $employe->setNom('Employé ' . $j.'-'. $dep->getNom());
-                $specialites = Specialite::cases();
-                $employe->setSpecialite($specialites[array_rand($specialites)]);
                 $employe->setCreatedAt(new \DateTimeImmutable());
                 $employe->setTel('070000000' .$key. $j);
                 $employe->setIsActive(true);

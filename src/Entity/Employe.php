@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Entity\Specialite;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -18,14 +17,11 @@ class Employe
     #[ORM\Column(type: 'string', length: 255)]
     private ?string $nom = null;
 
-    #[ORM\Column(type: 'string', length: 20, nullable: true)]
+    #[ORM\Column(type: 'string', length: 20)]
     private ?string $tel = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $adresse = null;
-
-    #[ORM\Column(type: 'string', enumType: Specialite::class)]
-    private ?Specialite $specialite = null;
 
     #[ORM\ManyToOne(targetEntity: Departement::class, inversedBy: 'employes')]
     #[ORM\JoinColumn(nullable: false)]
@@ -82,17 +78,6 @@ class Employe
     public function setAdresse(string $adresse): self
     {
         $this->adresse = $adresse;
-        return $this;
-    }
-
-    public function getSpecialite(): ?Specialite
-    {
-        return $this->specialite;
-    }
-
-    public function setSpecialite(Specialite $specialite): self
-    {
-        $this->specialite = $specialite;
         return $this;
     }
 

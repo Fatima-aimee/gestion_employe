@@ -1,0 +1,39 @@
+{% if nbrePage > 0 %}
+    {# On commence par récupérer tous les paramètres GET actuels #}
+    {% set routeParams = app.request.query.all %}
+
+    {# Si des paramètres spécifiques sont définis pour la page, on les ajoute #}
+    {% if idDept is defined and idDept is not null %}
+        {% set routeParams = routeParams|merge({'idDept': idDept}) %}
+    {% endif %}
+
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+
+            {# Bouton Précédent #}
+            <li class="page-item {{ pageEncours <= 1 ? 'disabled' }}">
+                <a class="page-link" 
+                   href="{{ pageEncours > 1 ? path(pathName, routeParams|merge({'page': pageEncours - 1})) : '#' }}" 
+                   tabindex="-1" aria-disabled="true">
+                   Précédent
+                </a>
+            </li>
+
+            {# Pages numérotées #}
+            {% for index in 1..nbrePage %}
+                <li class="page-item {{ pageEncours == index ? 'active' }}">
+                    <a class="page-link" href="{{ path(pathName, routeParams|merge({'page': index})) }}">{{ index }}</a>
+                </li>
+            {% endfor %}
+
+            {# Bouton Suivant #}
+            <li class="page-item {{ pageEncours >= nbrePage ? 'disabled' }}">
+                <a class="page-link" 
+                   href="{{ pageEncours < nbrePage ? path(pathName, routeParams|merge({'page': pageEncours + 1})) : '#' }}">
+                   Suivant
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+{% endif %}

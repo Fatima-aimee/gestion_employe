@@ -1,0 +1,87 @@
+{% extends "base.html.twig" %}
+
+{% block custumStylesheets %}
+    <style>
+        .form-section {
+            padding: 1rem 1.2rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+        }
+
+        .switch-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>Enregistrement d'un Employé</h3>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body form-section">
+
+            {{ form_start(formEmp) }}
+
+            <div class="row g-4">
+
+                <!-- Nom et prénom -->
+                <div class="col-md-6">
+                    <label class="form-label">Nom & Prénom</label>
+                    {{ form_widget(formEmp.nom) }}
+                </div>
+
+                <!-- Téléphone -->
+                <div class="col-md-6">
+                    <label class="form-label">Téléphone</label>
+                    {{ form_widget(formEmp.tel) }}
+                </div>
+
+                <!-- Date -->
+                <div class="col-md-6">
+                    <label class="form-label">Date d'embauche</label>
+                    {{ form_widget(formEmp.createdAt, {attr: {class: 'form-control'}}) }}
+                </div>
+
+                <!-- Département -->
+                <div class="col-md-6">
+                    <label class="form-label">Département</label>
+                    {{ form_widget(formEmp.departement) }}
+                </div>
+
+                <!-- Statut (switch) -->
+                <div class="form-group">
+                    {{ form_label(formEmp.isActive) }}
+                    <div class="form-check">
+                        {% for child in formEmp.isActive %}
+                            <div class="form-check">
+                                {{ form_widget(child, {'attr': {'class': 'form-check-input'}}) }}
+                                {{ form_label(child, null, {'label_attr': {'class': 'form-check-label'}}) }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {{ form_errors(formEmp.isActive) }}
+                </div>
+
+
+                <!-- Bouton -->
+                <div class="col-md-12 mt-3 text-end">
+                    {{ form_widget(formEmp.btnSaveDept) }}
+                </div>
+
+            </div>
+
+            {{ form_end(formEmp) }}
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

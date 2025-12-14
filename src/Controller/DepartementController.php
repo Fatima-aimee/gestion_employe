@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\DTO\DepartementListDto;
 use App\Entity\Departement;
 use App\Form\DepartementType;
 use App\Repository\DepartementRepository;
@@ -15,7 +14,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class DepartementController extends AbstractController
 {
     //Nombre d'element par page
-   private const LIMIT_PAR_PAGE=10;
+    private const LIMIT_PAR_PAGE=10;
     public function __construct(private readonly DepartementRepository $departementRepository)
     {
         
@@ -32,7 +31,6 @@ final class DepartementController extends AbstractController
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()){
             $this->departementRepository->save($departement,true);
-            $this->addFlash('success',"Departement ajouté avec succès");
             return $this->redirectToRoute('app_departement_list');
         }
         $page=$request->query->get("page",1);
