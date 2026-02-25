@@ -46,7 +46,7 @@ final class DepartementController extends AbstractController
                 'departements' => $departements,
                 "nbrePage"=>$nbrePage,
                 "pageEncours"=>$page,
-                "formDept"=>$form->createView() 
+                "formDept"=>$form->createView() //format html
             ]);
     }
     /*#[Route('/departement/create', name: 'app_departement_create',methods:["GET"])]
