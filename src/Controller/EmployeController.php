@@ -20,33 +20,45 @@ class EmployeController extends AbstractController
     }
     
     #[Route('/employe/list/{idDept?}', name: 'app_employe_list', methods: ['GET'])]
-    public function index(?int $idDept, Request $request): Response
+    public function index(Request $request): Response
     {
+        $search = $request->query->get('search');
+        $idDept = $request->query->get('idDept');
         $page = $request->query->getInt('page', 1);
-        $limit = self::LIMIT_PAR_PAGE; 
+
+        $limit = self::LIMIT_PAR_PAGE;
         $offset = ($page - 1) * $limit;
-        if ($idDept !== null) {
-            $employes = $this->employeRepository->findBy(
-                ['departement' => $idDept],
-                ['id' => 'asc'],
-                $limit,
-                $offset
-            );
-            $total = $this->employeRepository->count(['departement' => $idDept]);
-        } else {
-            $employes = $this->employeRepository->findBy(
-                [],
-                ['id' => 'asc'],
-                $limit,
-                $offset
-            );
-            $total = $this->employeRepository->count([]);
+
+        $qb = $this->employeRepository->createQueryBuilder('e')
+            ->leftJoin('e.departement', 'd')
+            ->addSelect('d');
+
+        if ($search) {
+            $qb->andWhere('e.tel LIKE :search')
+            ->setParameter('search', '%'.$search.'%');
         }
+
+        if ($idDept) {
+            $qb->andWhere('d.id = :idDept')
+            ->setParameter('idDept', $idDept);
+        }
+
+        $total = count($qb->getQuery()->getResult());
+
+        $employes = $qb
+            ->setFirstResult($offset)
+            ->setMaxResults($limit)
+            ->orderBy('e.id', 'ASC')
+            ->getQuery()
+            ->getResult();
+
         $nbrePage = ceil($total / $limit);
+
         return $this->render('employe/index.html.twig', [
             'employes' => $employes,
             'pageEncours' => $page,
             'nbrePage' => $nbrePage,
+            'search' => $search,
             'idDept' => $idDept,
             'departements' => $this->departementRepository->findAll(),
         ]);
